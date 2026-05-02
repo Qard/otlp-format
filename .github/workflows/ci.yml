@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test ${{ matrix.signal }} (${{ matrix.target.os }}, ${{ matrix.target.cc }})
+    runs-on: ${{ matrix.target.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        signal: [all, logs, traces, metrics, profiles]
+        target:
+          - {os: ubuntu-latest, cc: gcc, cxx: g++}
+          - {os: ubuntu-latest, cc: clang, cxx: clang++}
+          - {os: macos-latest, cc: clang, cxx: clang++}
+          - {os: windows-latest, cc: clang, cxx: clang++}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install make (Windows)
+        if: runner.os == 'Windows'
+        run: choco install make -y
+      - shell: bash
+        run: make ${{ matrix.signal == 'all' && 'test' || format('test-{0}-only', matrix.signal) }}
+        env:
+          CC: ${{ matrix.target.cc }}
+          CXX: ${{ matrix.target.cxx }}
+
+  check-header:
+    name: Bundled header up to date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: make check-header

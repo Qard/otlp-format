@@ -1,0 +1,9 @@
+CompileFlags:
+  Add:
+    - -I.
+    - -Itestdeps
+    - -Itests
+    - -DOTLP_FORMAT_ENABLE_LOGS=1
+    - -DOTLP_FORMAT_ENABLE_PROFILES=1
+    - -DOTLP_FORMAT_ENABLE_TRACES=1
+    - -DOTLP_FORMAT_ENABLE_METRICS=1
